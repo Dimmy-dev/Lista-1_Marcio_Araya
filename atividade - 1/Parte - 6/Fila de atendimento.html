@@ -1,0 +1,80 @@
+<html lang="pt-br">
+<body>
+    </p>
+    <script>
+        alert("___Fila de Atendimento___")
+
+        let fila_atual = []
+        let historico_fila = []
+
+        let fmt = new Intl.DateTimeFormat('pt-BR', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit', second: '2-digit'
+        })
+
+        function mostrar_vetores() {
+            let msg = "=== FILA ATUAL ===\n"
+            if (fila_atual.length == 0) {
+                msg += "(vazia)\n"
+            } else {
+                for (let i = 0; i < fila_atual.length; i++) {
+                    msg += `${i + 1}. ${fila_atual[i].nome} — entrou às ${fmt.format(new Date(fila_atual[i].timestamp))}\n`
+                }
+            }
+            msg += "\n=== HISTÓRICO DE ATENDIMENTOS ===\n"
+            if (historico_fila.length == 0) {
+                msg += "(nenhum atendimento ainda)"
+            } else {
+                for (let p of historico_fila) {
+                    msg += `${p.nome} | entrou: ${p.entrou} | atendido: ${p.atendido} | espera: ${p.espera}\n`
+                }
+            }
+            alert(msg)
+        }
+
+        function entrar_na_fila() {
+            let nome = prompt("Nome da pessoa:")
+            if (!nome || !nome.trim()) {
+                alert("Nome inválido.")
+                return
+            }
+            fila_atual.push({ nome: nome.trim(), timestamp: Date.now() })
+            mostrar_vetores()
+        }
+
+        function atender() {
+            if (fila_atual.length == 0) {
+                alert("A fila está vazia.")
+                return
+            }
+            let pessoa = fila_atual.shift()
+            let agora = Date.now()
+            let espera = agora - pessoa.timestamp
+            let seg = Math.floor(espera / 1000)
+            let min = Math.floor(seg / 60)
+            let h = Math.floor(min / 60)
+            let espera_str = `${String(h).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}:${String(seg % 60).padStart(2, '0')}`
+
+            historico_fila.push({
+                nome: pessoa.nome,
+                entrou: fmt.format(new Date(pessoa.timestamp)),
+                atendido: fmt.format(new Date(agora)),
+                espera: espera_str
+            })
+            mostrar_vetores()
+        }
+
+        let continuar = true
+        while (continuar) {
+            let acao = prompt("Fila de Atendimento:\n1 - Entrar na fila\n2 - Atender\n3 - Sair")
+            if (acao == "1") {
+                entrar_na_fila()
+            } else if (acao == "2") {
+                atender()
+            } else {
+                continuar = false
+            }
+        }
+    </script>
+</body>
+</html>
